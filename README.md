@@ -1,7 +1,7 @@
-import
-======
+import_generic
+==============
 
-An xmlrpc script to insert customers into an openerp 7 database
+An xmlrpc script to insert or update data into an openerp 7 database
 
 **csv_parser**
 
@@ -11,11 +11,11 @@ A csv parser (parse nothing for now, just give all the rows one by one)
 
 Contain the ServerProxy and the socket, plus some usefull methods.
 
-**insert**
+**insert_something**
 
-The insertion script. Modify this to suit your needs.
+The insertion scripts. Modify these to suit your needs, or create a new one.
 
 ##TODO:
 
-* generalize for res.partner (suppliers, clients)
+* generalize for res.partner (suppliers, customers)
 * later, the script will be able to connect partners together (contacts into companies for example)

@@ -17,22 +17,6 @@ Manage the insertion of data into a database.
         self.db = dbname
         self.pwd = password
     
-    def build_data(self, row, fieldsNames):
-        data = {}
-        for key in fieldsNames:
-            value = fieldsNames[key]
-            if value['type'] == 0:
-                data[key] = value['value']
-            elif value['type'] == 1:
-                data[key] = row[value['columnName']]
-            elif value['type'] == 2:
-                records = value['records']
-                trueKey = row[value['columnName']]
-                data[key] = records[trueKey]
-            else:
-                raise Exception
-        return data
-    
     def insertOrUpdate(self, ref, model, data, checkList):
         '''
 Check the table ir_model_data to see if the ref exist, then insert or update in the given model.
