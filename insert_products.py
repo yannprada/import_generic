@@ -45,7 +45,7 @@ class ProductManager(Manager):
                     ref, 'product.product', data_product, existing_prod_prod_records)
             
             if display == True:
-                print(str(count) + ' --- ID: ' + str(ID))
+                print(str(count) + ' --- ID: ' + str(product_product_id))
 
 
 if __name__ == '__main__':
