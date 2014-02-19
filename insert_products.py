@@ -14,21 +14,17 @@ class ProductManager(Manager):
         existing_prod_tmpl_records = self.prepare_ir_model_data('product.template')
         existing_prod_prod_records = self.prepare_ir_model_data('product.product')
         category_records = self.prepare_many2one('product.category')
-        fields = ['name', 'description', 'weight_net', 'standard_price', 'list_price', 'type']
+        fields_tmpl = ['name', 'description', 'weight_net', 'standard_price', 'list_price', 'type']
         
         c = CsvParser(fileName, delimiter=';')
         for row, count in c.rows():
             # product_template
-            data_tmpl = {
-                'sale_ok': True,
-                'purchase_ok': True,
-                'supply_method': 'buy',
-                'procure_method': 'make_to_stock',
-                'categ_id': category_records[row['category']]
-            }
-            
-            for field in fields:
-                data_tmpl[field] = row[field]
+            data_tmpl = {field: row[field] for field in fields_tmpl}
+            data_tmpl['sale_ok'] = True
+            data_tmpl['purchase_ok'] = True
+            data_tmpl['supply_method'] = 'buy'
+            data_tmpl['procure_method'] = 'make_to_stock'
+            data_tmpl['categ_id'] = category_records[row['category']]
             
             ref = row['ref']
             product_tmpl_id = self.insertOrUpdate(
@@ -57,7 +53,7 @@ Usage:
         sys.exit()
     else:
         t1 = time.time()
-        pm = ProductManager(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], True)
+        m = ProductManager(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], True)
         t2 = time.time()
         print('Duration: ' + time.strftime('%H:%M:%S', time.gmtime(t2-t1)))
 
