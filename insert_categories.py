@@ -28,7 +28,7 @@ class CategoryManager(Manager):
                 print(str(count) + ' --- ID: ' + str(ID))
 
     def getParent(self, parentName):
-        ids = self.search('product.category', [('name', '=', row['parent'])])
+        ids = self.search('product.category', [('name', '=', parentName)])
         return ids[0] if len(ids) > 0 else self.master_category_id
 
 

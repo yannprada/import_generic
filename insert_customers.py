@@ -14,11 +14,15 @@ class CustomerManager(Manager):
         existing_partners_records = self.prepare_ir_model_data('res.partner')
         title_records = self.prepare_many2one('res.partner.title')
         country_records = self.prepare_many2one('res.country')
-        fields = ['name', 'street', 'zip', 'city', 'phone', 'mobile', 'fax', 'email', 'website', 'customer', 'is_company']
+        fields_strings = ['name', 'street', 'zip', 'city', 'phone', 'mobile', 'fax', 'email', 'website']
+        fields_booleans = ['customer', 'is_company']
         
         c = CsvParser(fileName)
         for row, count in c.rows():
-            data = {field: row[field] for field in fields}
+            data = {field: row[field] for field in fields_strings}
+            for field in fields_booleans:
+                data[field] = self.booleanFromString(row[field])
+            
             data['title'] = title_records[row['title']]
             data['country'] = country_records[row['country']]
             

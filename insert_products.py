@@ -15,6 +15,8 @@ class ProductManager(Manager):
         existing_prod_prod_records = self.prepare_ir_model_data('product.product')
         category_records = self.prepare_many2one('product.category')
         fields_tmpl = ['name', 'description', 'weight_net', 'standard_price', 'list_price', 'type']
+        taxes_id = self.search('account.tax', [('description', '=', '20')])
+        supplier_taxes_id = self.search('account.tax', [('description', '=', 'ACH-20')])
         
         c = CsvParser(fileName, delimiter=';')
         for row, count in c.rows():
@@ -36,7 +38,10 @@ class ProductManager(Manager):
                 'name_template': row['name'],
                 'active': True,
                 'product_tmpl_id': product_tmpl_id,
+                'taxes_id': [(6, 0, taxes_id)],
+                'supplier_taxes_id': [(6, 0, supplier_taxes_id)],
             }
+            
             product_product_id = self.insertOrUpdate(
                     ref, 'product.product', data_product, existing_prod_prod_records)
             

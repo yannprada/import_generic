@@ -17,6 +17,14 @@ Manage the insertion of data into a database.
         self.db = dbname
         self.pwd = password
     
+    def booleanFromString(self, stringWhichContainABoolean):
+        if stringWhichContainABoolean == 'True' or stringWhichContainABoolean == '1':
+            return True
+        elif stringWhichContainABoolean == 'False' or stringWhichContainABoolean == '0':
+            return False
+        else:
+            raise Exception
+    
     def insertOrUpdate(self, ref, model, data, checkList):
         '''
 Check the table ir_model_data to see if the ref exist, then insert or update in the given model.
@@ -50,14 +58,14 @@ into an object like this one:
             result[item[fieldKey]] = item[fieldValue]
         return result
     
-    def prepare_many2one(self, model):
+    def prepare_many2one(self, model, field='name'):
         '''
 Search all the records for a given model, then returns an object with name as key and id as value.
 Usefull when a name is given in the csv file for a many2one relation.
         '''
         ids = self.search(model, [])
-        data = self.read(model, ids, ['name'])
-        data = self.list_to_object(data, 'name', 'id')
+        data = self.read(model, ids, [field])
+        data = self.list_to_object(data, field, 'id')
         data[''] = False
         return data
     

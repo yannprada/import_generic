@@ -11,16 +11,24 @@ from manager import Manager
 class StockManager(Manager):
     def __init__(self, host, dbname, password, fileName, display=False):
         super(StockManager, self).__init__(host, dbname, password)
-        fields = ['product_qty', 'product_ref', 'description', 'city', 'phone', 'mobile', 'fax', 'email', 'website', 'customer', 'is_company']
+        products_records = self.prepare_many2one('product.product', 'default_code')
+        location_records = self.prepare_many2one('stock.location')
+        uom_records = self.prepare_many2one('product.uom')
+        location_fields = ['source', 'destination']
         
         c = CsvParser(fileName)
         for row, count in c.rows():
-            data = {field: row[field] for field in fields}
-            data['product_id'] = title_records[row['title']]
-            data['country'] = country_records[row['country']]
+            data = {
+                'product_id': products_records[row['ref']],
+                'product_qty': row['qty'],
+                'product_uom': uom_records[row['uom']],
+                'location_id': location_records[row['source']],
+                'location_dest_id': location_records[row['destination']],
+                'state': 'done',
+                'name': row['ref'],
+            }
             
-            ref = row['ref']
-            ID = self.insertOrUpdate(ref,'res.partner', data, existing_partners_records)
+            ID = self.create('stock.move', data)
             
             if display == True:
                 print(str(count) + ' --- ID: ' + str(ID))
