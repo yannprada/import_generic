@@ -46,11 +46,11 @@ return: id
             ir_model_data_id = self.create('ir.model.data', data_model)
         return ID
     
-    def list_to_object(self, data, fieldKey, fieldValue):
+    def list_to_dict(self, data, fieldKey, fieldValue):
         '''
-Transform a list of objects like this:
+Transform a list of dicts like this:
 [{name: Dupont, ref: ex12t}, ...]
-into an object like this one:
+into a dict like this one:
 {Dupont: ex12t, ...}
         '''
         result = {}
@@ -60,11 +60,11 @@ into an object like this one:
     
     def prepare_many2one(self, model, field='name'):
         '''
-Search all the records for a given model, then returns an object with name as key and id as value.
+Search all the records for a given model, then returns a dict with name as key and id as value.
 Usefull when a name is given in the csv file for a many2one relation.
         '''
         data = self.all_records(model, [field])
-        data = self.list_to_object(data, field, 'id')
+        data = self.list_to_dict(data, field, 'id')
         data[''] = False
         return data
     
@@ -74,11 +74,11 @@ Usefull when a name is given in the csv file for a many2one relation.
     
     def prepare_ir_model_data(self, model):
         '''
-Search all the records in ir.model.data for a given model, then returns an object with ref as key and id as value.
+Search all the records in ir.model.data for a given model, then returns a dict with ref as key and id as value.
         '''
         ids = self.search('ir.model.data', [('model', '=', model)])
         data = self.read('ir.model.data', ids, ['name', 'res_id'])
-        return self.list_to_object(data, 'name', 'res_id')
+        return self.list_to_dict(data, 'name', 'res_id')
     
     def search(self, model, args):
         return self.sock.execute(self.db, self.uid, self.pwd, model, 'search', args)    

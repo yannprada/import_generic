@@ -33,12 +33,20 @@ class MyStockManager(StockManager):
     def __init__(self, host, dbname, password, fileName, display=False):
         super(MyStockManager, self).__init__(host, dbname, password)
         data = self.all_records('product.product', ['default_code', 'name_template'])
-        product_records = self.list_to_object(data, 'default_code', 'name_template')
+        product_records = self.list_to_dict(data, 'default_code', 'name_template')
         
         c = CsvParser(fileName)
         for row, count in c.rows():
-            name = '[' + row['ref'] + '] ' + product_records[row['ref']]
-            ID = self.update_stock(row['ref'], row['qty'], row['uom'], row['source'], row['destination'], 'done', name)
+            kwargs = {
+                'product_ref': row['ref'],
+                'product_qty': row['qty'],
+                'product_uom': row['uom'],
+                'source': row['source'],
+                'destination': row['destination'],
+                'state': 'done',
+                'name': '[' + row['ref'] + '] ' + product_records[row['ref']],
+            }
+            ID = self.update_stock(**kwargs)
             
             if display == True:
                 print(str(count) + ' --- ID: ' + str(ID))
