@@ -63,11 +63,14 @@ into an object like this one:
 Search all the records for a given model, then returns an object with name as key and id as value.
 Usefull when a name is given in the csv file for a many2one relation.
         '''
-        ids = self.search(model, [])
-        data = self.read(model, ids, [field])
+        data = self.all_records(model, [field])
         data = self.list_to_object(data, field, 'id')
         data[''] = False
         return data
+    
+    def all_records(self, model, fields):
+        ids = self.search(model, [])
+        return self.read(model, ids, fields)
     
     def prepare_ir_model_data(self, model):
         '''

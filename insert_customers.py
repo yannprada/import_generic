@@ -9,25 +9,46 @@ from manager import Manager
 
 
 class CustomerManager(Manager):
-    def __init__(self, host, dbname, password, fileName, display=False):
+    def __init__(self, host, dbname, password):
         super(CustomerManager, self).__init__(host, dbname, password)
-        existing_partners_records = self.prepare_ir_model_data('res.partner')
-        title_records = self.prepare_many2one('res.partner.title')
-        country_records = self.prepare_many2one('res.country')
-        fields_strings = ['name', 'street', 'zip', 'city', 'phone', 'mobile', 'fax', 'email', 'website']
-        fields_booleans = ['customer', 'is_company']
+        self.existing_partners_records = self.prepare_ir_model_data('res.partner')
+        self.many2one_records = {
+            'title': self.prepare_many2one('res.partner.title'),
+            'country': self.prepare_many2one('res.country'),
+        }
+    
+    def insert(self, raw_data, many2one_data, ref):
+        data = {field: raw_data[field] for field in raw_data}
+        for field in many2one_data:
+            data[field] = self.many2one_records[field][many2one_data[field]]
+        
+        return self.insertOrUpdate(ref,'res.partner', data, self.existing_partners_records)
+
+
+class MyCustomerManager(CustomerManager):
+    def __init__(self, host, dbname, password, fileName, display=False):
+        super(MyCustomerManager, self).__init__(host, dbname, password)
         
         c = CsvParser(fileName)
         for row, count in c.rows():
-            data = {field: row[field] for field in fields_strings}
-            for field in fields_booleans:
-                data[field] = self.booleanFromString(row[field])
-            
-            data['title'] = title_records[row['title']]
-            data['country'] = country_records[row['country']]
-            
-            ref = row['ref']
-            ID = self.insertOrUpdate(ref,'res.partner', data, existing_partners_records)
+            raw_data = {
+                'name': row['name'],
+                'street': row['street'],
+                'zip': row['zip'],
+                'city': row['city'],
+                'phone': row['phone'],
+                'mobile': row['mobile'],
+                'fax': row['fax'],
+                'email': row['email'],
+                'website': row['website'],
+                'customer': self.booleanFromString(row['customer']),
+                'is_company': self.booleanFromString(row['is_company']),
+            }
+            many2one_data = {
+                'title': row['title'],
+                'country': row['country'],
+            }
+            ID = self.insert(raw_data, many2one_data, row['ref'])
             
             if display == True:
                 print(str(count) + ' --- ID: ' + str(ID))
@@ -42,7 +63,7 @@ Usage:
         sys.exit()
     else:
         t1 = time.time()
-        m = CustomerManager(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], True)
+        m = MyCustomerManager(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], True)
         t2 = time.time()
         print('Duration: ' + time.strftime('%H:%M:%S', time.gmtime(t2-t1)))
 
